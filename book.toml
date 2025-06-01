@@ -1,0 +1,9 @@
+[book]
+authors = ["jojongguk"]
+language = "ko"
+src = "src"
+title = "WGPU Fundamentals"
+
+[output.html]
+# additional-js = ["theme/wgpu-loader.js", "src/wgpu-examples/pkg/wgpu_examples.js"]
+additional-css = ["theme/custom.css"]
