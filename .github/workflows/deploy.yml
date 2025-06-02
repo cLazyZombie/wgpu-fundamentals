@@ -1,0 +1,90 @@
+name: Build and Deploy mdbook with WebAssembly
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: wasm32-unknown-unknown
+
+    - name: Install wasm-pack
+      run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+    - name: Cache Rust dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: Build WebAssembly
+      run: |
+        examples/build.sh
+        # wasm 프로젝트가 있는 디렉토리로 이동 (예: wasm/ 디렉토리)
+        # cd wasm
+        # wasm-pack build --target web --out-dir ../book/wasm-pkg
+
+    # - name: Setup Node.js (if needed for additional processing)
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: '18'
+
+    - name: Install mdbook
+      run: |
+        curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.36/mdbook-v0.4.36-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+        chmod +x mdbook
+        sudo mv mdbook /usr/local/bin/
+
+    - name: Install mdbook plugins (optional)
+      run: |
+        # mdbook-mermaid 등 필요한 플러그인 설치
+        # cargo install mdbook-mermaid
+
+    - name: Build mdbook
+      run: mdbook build
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: ./book
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2

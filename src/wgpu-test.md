@@ -30,7 +30,7 @@
         
         try {
             // WebAssembly 모듈 동적 로드
-            const wasmModule = await import('./assets/wasm/wgpu_triangle.js');
+            const wasmModule = await import('./assets/wasm/wgpu-triangle/wgpu_triangle.js');
             
             // wasm 초기화
             await wasmModule.default();
