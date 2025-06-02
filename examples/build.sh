@@ -12,7 +12,7 @@ echo "Building WGPU examples..."
 
 # WASM 빌드
 cd examples/wgpu-triangle
-wasm-pack build --target web --out-dir ../../src/assets/wasm/wgpu-triangle
+wasm-pack build --target web --out-dir ../../src/assets/wasm/wgpu-triangle --release
 cd ../..
 
 # echo "Building mdBook..."

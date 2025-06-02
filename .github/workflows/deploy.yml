@@ -29,10 +29,10 @@ jobs:
         targets: wasm32-unknown-unknown
 
     - name: Install wasm-pack
-      run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+      uses: jetli/wasm-pack-action@v0.4.0
 
     - name: Cache Rust dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cargo/bin/
@@ -41,13 +41,12 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
 
     - name: Build WebAssembly
       run: |
         examples/build.sh
-        # wasm 프로젝트가 있는 디렉토리로 이동 (예: wasm/ 디렉토리)
-        # cd wasm
-        # wasm-pack build --target web --out-dir ../book/wasm-pkg
 
     # - name: Setup Node.js (if needed for additional processing)
     #   uses: actions/setup-node@v4
@@ -55,24 +54,25 @@ jobs:
     #     node-version: '18'
 
     - name: Install mdbook
-      run: |
-        curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.36/mdbook-v0.4.36-x86_64-unknown-linux-gnu.tar.gz | tar -xz
-        chmod +x mdbook
-        sudo mv mdbook /usr/local/bin/
+      uses: peaceiris/actions-mdbook@v2
+      with:
+        mdbook-version: 'latest'
 
     - name: Install mdbook plugins (optional)
       run: |
-        # mdbook-mermaid 등 필요한 플러그인 설치
-        # cargo install mdbook-mermaid
+        # 필요한 경우 플러그인 설치 (예시)
+        # cargo install mdbook-mermaid --version "^0.12"
+        # cargo install mdbook-katex --version "^0.5"
+        echo "Add mdbook plugins installation if needed"
 
     - name: Build mdbook
       run: mdbook build
 
     - name: Setup Pages
-      uses: actions/configure-pages@v3
+      uses: actions/configure-pages@v5
 
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
       with:
         path: ./book
 
@@ -87,4 +87,4 @@ jobs:
     steps:
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v2
+      uses: actions/deploy-pages@v4
