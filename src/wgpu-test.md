@@ -18,7 +18,7 @@
 <!-- }); -->
 <!-- </script> -->
 <div id="wgpu-demo-container" style="text-align: center; margin: 20px 0;">
-    <canvas id="wgpu-canvas" width="600" height="400" style="border: 2px solid #333; background: white; max-width: 100%;"></canvas>
+    <canvas id="wgpu-canvas" width="600" height="400" style="border: 2px solid #333; background: white; max-width: 100%; aspect-ratio: 3/2;"></canvas>
     <div id="loading" style="margin-top: 10px;">Loading WebAssembly...</div>
     <div id="error" style="margin-top: 10px; color: red; display: none;"></div>
 </div>
