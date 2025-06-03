@@ -1,10 +1,11 @@
 use std::cell::RefCell;
 use std::rc::Rc;
+
 use wasm_bindgen::prelude::*;
 use web_sys::{HtmlCanvasElement, ResizeObserver, ResizeObserverEntry, console};
 
 thread_local! {
-    static GLOBAL_STATE: RefCell<Option<Rc<RefCell<State>>>> = RefCell::new(None);
+    static GLOBAL_STATE: RefCell<Option<Rc<RefCell<State>>>> = const { RefCell::new(None) };
 }
 
 struct State {
